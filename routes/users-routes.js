@@ -9,9 +9,7 @@ router.get('/users', (req, res) =>{
     res.send({users:45})
 });
 
-router.post('/signup', (req, res) => {
-    console.log(req.body);
-});
+router.post('/signup', contollers.signUp);
 
 router.post('/login', contollers.login);
 
