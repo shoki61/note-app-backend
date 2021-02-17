@@ -15,5 +15,7 @@ router.get('/user/:id', contollers.getUser);
 
 router.patch('/update-user/:id', contollers.updateUser);
 
+router.delete('/delete-user/:id', contollers.deleteUser); 
+
 
 module.exports = router;

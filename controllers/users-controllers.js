@@ -101,6 +101,21 @@ const updateUser = async (req, res, next) => {
   };
 };
 
+const deleteUser = async(req, res, next) => {
+    const userId = req.params.id;
+
+    let user;
+    try {
+        user = await User.findById(userId);
+        if(!user){
+            return res.status(404).json({message: errors.notFound('User')});
+        };
+        user.remove();
+        res.json({deleted:user});
+    } catch(e) {
+        return res.status().json({message: errors.unexpected});
+    };
+};
 
 
 module.exports = {
@@ -108,5 +123,6 @@ module.exports = {
   login,
   getUsers,
   getUser,
-  updateUser
+  updateUser,
+  deleteUser
 };
