@@ -11,4 +11,6 @@ router.post('/create-note', contollers.createNote);
 
 router.patch('/update-note/:id', contollers.updateNote);
 
+router.delete('/delete-note/:id', contollers.deleteNote);
+
 module.exports = router;

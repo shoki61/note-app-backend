@@ -39,9 +39,6 @@ const updateNote = async(req, res, next) => {
     const noteId = req.params.id;
 
     const updates = Object.keys(req.body);
-    if(!updates.length){
-        return res.status(404).json({message: 'Please enter an item you want to update.'});
-    };
     const allowedUpdates = ["title", "description"];
     const isValidOperation = updates.every(update => allowedUpdates.includes(update));
     if(!isValidOperation) {
@@ -60,9 +57,25 @@ const updateNote = async(req, res, next) => {
     };
 };
 
+const deleteNote = async(req, res, next) => {
+    const noteId = req.params.id;
+
+    try {
+        const note = await Note.findById(noteId);
+        if(!note) {
+            return res.status(404).json({message: errors.notFound('Note')});
+        };
+        note.remove();
+        res.status(200).json({deleted: note});
+    } catch(e){
+        return res.status(500).json({message: errors.unexpected});
+    };
+};
+
 
 module.exports = {
     getNotes,
     createNote,
-    updateNote
+    updateNote,
+    deleteNote
 };
