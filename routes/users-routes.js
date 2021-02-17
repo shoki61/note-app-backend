@@ -5,10 +5,12 @@ const contollers = require('../controllers/users-controllers');
 const router = express.Router();
 
 
-router.get('/users', contollers.getUsers);
-
 router.post('/signup', contollers.signUp);
 
 router.post('/login', contollers.login);
+
+router.get('/users', contollers.getUsers);
+
+router.patch('/update-user/:id', contollers.updateUser)
 
 module.exports = router;
