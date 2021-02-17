@@ -5,9 +5,7 @@ const contollers = require('../controllers/users-controllers');
 const router = express.Router();
 
 
-router.get('/users', (req, res) =>{
-    res.send({users:45})
-});
+router.get('/users', contollers.getUsers);
 
 router.post('/signup', contollers.signUp);
 
