@@ -72,10 +72,19 @@ const deleteNote = async(req, res, next) => {
     };
 };
 
+const deleteAllNotes = async(req, res, next) => {
+    try {
+        await Note.deleteMany({});
+        res.status(200).json({message: 'All notes deleted'});
+    } catch(e){
+        return res.status(500).json({message: errors.unexpected});
+    };
+};
 
 module.exports = {
     getNotes,
     createNote,
     updateNote,
-    deleteNote
+    deleteNote,
+    deleteAllNotes
 };
