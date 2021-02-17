@@ -28,8 +28,11 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
         minlength: 8
+    },
+    image: {
+        type:String
     }
-});
+},{timestamps: true});
 
 
 const User = mongoose.model('User', userSchema);

@@ -11,8 +11,11 @@ const noteSchema = mongoose.Schema({
         type: String,
         trim: true,
         required: true
+    },
+    image: {
+        type: String
     }
-});
+},{timestamps: true});
 
 
 const Note = mongoose.model('Note', userSchema);

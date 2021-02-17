@@ -12,4 +12,6 @@ app.use('/api',userRouter);
 
 
 
-mongoose.connect().then(() => app.listen(5000)).catch(error => console.log(error));
+mongoose.connect('mongodb+srv://shoki:murtishoki61@cluster0.sbiw4.mongodb.net/notes?retryWrites=true&w=majority')
+    .then(() => app.listen(5000))
+    .catch(error => console.log(error));
