@@ -7,7 +7,8 @@ const router = express.Router();
 
 router.get('/', contollers.getNotes);
 
-router.post('/create-note', contollers.createNote)
+router.post('/create-note', contollers.createNote);
 
+router.patch('/update-note/:id', contollers.updateNote);
 
 module.exports = router;

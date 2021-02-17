@@ -35,8 +35,34 @@ const createNote = async(req, res, next) => {
     };
 };
 
+const updateNote = async(req, res, next) => {
+    const noteId = req.params.id;
+
+    const updates = Object.keys(req.body);
+    if(!updates.length){
+        return res.status(404).json({message: 'Please enter an item you want to update.'});
+    };
+    const allowedUpdates = ["title", "description"];
+    const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+    if(!isValidOperation) {
+        return res.status(400).json({message: 'Please enter an item you want to update.'});
+    };
+    try {
+        let note = await Note.findById(noteId);
+        if(!note){
+            return res.status(404).json({message: errors.notFound('Note')});
+        };
+        updates.forEach(update => note[update] = req.body[update]);
+        await note.save();
+        res.status(200).json({note});
+    } catch(e){
+        return res.status(500).json({message: errors.unexpected});
+    };
+};
+
 
 module.exports = {
     getNotes,
-    createNote
+    createNote,
+    updateNote
 };

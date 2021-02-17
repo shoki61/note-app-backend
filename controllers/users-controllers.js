@@ -85,7 +85,7 @@ const updateUser = async (req, res, next) => {
   const allowedUpdates = ["name", "email", "password", "job"];
   const isValidOperation = updates.every(update => allowedUpdates.includes(update));
   if (!isValidOperation) {
-    return res.status(404).send({message:'Please enter an item you want to update'});
+    return res.status(400).send({message:'Please enter an item you want to update'});
   };
 
   try {
@@ -97,7 +97,7 @@ const updateUser = async (req, res, next) => {
     await user.save();
     res.status(200).json({user});
   } catch (e) {
-    return res.status(400).json({message: errors.unexpected});
+    return res.status(500).json({message: errors.unexpected});
   };
 };
 
