@@ -5,6 +5,7 @@ const notFound = value => `${value} Not found`;
 const verification = 'Loging in failed, please try again later.';
 const update = 'There was an error updating please try again';
 const invalid = 'You entered an invalid value';
+const required = 'Do not leave blank the required fields.'
 
 
 module.exports  = {
@@ -12,5 +13,6 @@ module.exports  = {
     notFound,
     verification,
     update,
-    invalid
+    invalid,
+    required
 };

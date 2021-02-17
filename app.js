@@ -14,6 +14,6 @@ app.use('/api/notes', notesRouter);
 
 
 
-mongoose.connect('mongodb+srv://shoki:murtishoki61@cluster0.sbiw4.mongodb.net/notes?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://shoki:murtishoki61@cluster0.sbiw4.mongodb.net/mern?retryWrites=true&w=majority')
     .then(() => app.listen(5000))
     .catch(error => console.log(error));

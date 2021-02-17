@@ -16,8 +16,27 @@ const getNotes = async(req, res, next) => {
     };
 };
 
+const createNote = async(req, res, next) => {
+    const {title, description, image} = req.body;
+
+    if(!title || !description){
+        return res.status(400).json({message: errors.required});
+    };
+    try {
+        const note = new Note({
+            title,
+            description,
+            image: image || ''
+        });
+        note.save();
+        return res.status(201).json({note});
+    } catch(e){
+        return next(res.status(500).json({message: errors.unexpected}));
+    };
+};
 
 
 module.exports = {
-    getNotes
+    getNotes,
+    createNote
 };
