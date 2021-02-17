@@ -1,11 +1,13 @@
 const validator = require("validator");
 
 const User = require("../models/user");
+const errors = require('../error-messages/messages');
+
 
 const signUp = async (req, res, next) => {
   const { name, email, password, job } = req.body;
   if (!validator.isEmail(email) || !validator.isLength(password, { min: 8 })) {
-    return res.json({ message: "invalid value" });
+    return res.json({ message: errors.invalid });
   }
   const user = new User({
     name,
@@ -17,7 +19,7 @@ const signUp = async (req, res, next) => {
     await user.save();
     res.status(201).json({ user });
   } catch (e) {
-    return res.json({ error: e });
+    return res.json({ message: errors.unexpected });
   }
 };
 
@@ -32,7 +34,7 @@ const login = async (req, res, next) => {
   } catch (e) {
     return res
       .status(500)
-      .json({ message: "Loging in failed, please try again later." });
+      .json({ message: errors.verification });
   }
 
   if (!user) {
@@ -54,14 +56,26 @@ const getUsers = async (req, res, next) => {
   try {
     users = await User.find({});
     if (!users.length) {
-      return res.status(500).json({ message: "No user found" });
+      return res.status(500).json({ message: errors.notFound('Users') });
     }
     res.status(200).json({ users });
   } catch (e) {
     return res
       .status(500)
-      .json({ message: "Unexpected error please try again" });
+      .json({ message: errors.unexpected });
   }
+};
+
+const getUser = async(req, res, next) => {
+    const userId = req.params.id;
+
+    let user;
+    try {
+        user = await User.findById(userId);
+        res.json(user);
+    }catch(e) {
+        return res.status(500).json({message: errors.notFound('User')});
+    };
 };
 
 const updateUser = async (req, res, next) => {
@@ -77,20 +91,22 @@ const updateUser = async (req, res, next) => {
   try {
     let user = await User.findById(userId);
     if(!user){
-        return res.status(404).json({message:'User not found'});
+        return res.status(404).json({message: errors.notFound('User')});
     };
     updates.forEach(update => user[update] = req.body[update]);
     await user.save();
     res.status(200).json({user});
   } catch (e) {
-    return res.status(400).json({message:'Unexpected error please try again'});
+    return res.status(400).json({message: errors.unexpected});
   };
 };
+
 
 
 module.exports = {
   signUp,
   login,
   getUsers,
-  updateUser,
+  getUser,
+  updateUser
 };

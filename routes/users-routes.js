@@ -11,6 +11,9 @@ router.post('/login', contollers.login);
 
 router.get('/users', contollers.getUsers);
 
-router.patch('/update-user/:id', contollers.updateUser)
+router.get('/user/:id', contollers.getUser);
+
+router.patch('/update-user/:id', contollers.updateUser);
+
 
 module.exports = router;
