@@ -2,13 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-const userRouter = require('./routes/users-routes');
+const usersRouter = require('./routes/users-routes');
+const notesRouter = require('./routes/notes-routes');
 
 const app = express();
 
 
 app.use(bodyParser.json());
-app.use('/api',userRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/notes', notesRouter);
 
 
 

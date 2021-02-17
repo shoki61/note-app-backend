@@ -9,7 +9,7 @@ router.post('/signup', contollers.signUp);
 
 router.post('/login', contollers.login);
 
-router.get('/users', contollers.getUsers);
+router.get('/', contollers.getUsers);
 
 router.get('/user/:id', contollers.getUser);
 
