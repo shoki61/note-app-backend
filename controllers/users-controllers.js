@@ -38,6 +38,7 @@ const login = async (req, res, next) => {
   if (!validator.isEmail(email)) {
     return res.json({ message: "Please enter valid email" });
   }
+
   let user;
   try {
     user = await User.findOne({ email });
@@ -46,31 +47,23 @@ const login = async (req, res, next) => {
       .status(500)
       .json({ message: errors.verification });
   }
-
   if (!user) {
     return res
       .status(401)
       .json({ message: "No user registered to this email, please sign up." });
   }
 
-  let isValidPassword;
-
+  let isValidPassword = false;
   try {
     isValidPassword = await bcrypt.compare(password, user.password);
   } catch(e){
     return res.status.json({message:'Coult not log you in, please check your credentials and try egain.'});
   };
-
-  if(!isValisPassword){
+  if(!isValidPassword){
     return res.status(401).json({message:'Invalid credentials, could not log you in'});
   };
 
-  if (user.password !== password) {
-    return res
-      .status(401)
-      .json({ message: "Your password is incorrect, please try again." });
-  }
-  res.json({ user });
+  res.status(200).json({ user });
 };
 
 const getUsers = async (req, res, next) => {

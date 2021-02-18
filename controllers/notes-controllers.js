@@ -107,6 +107,5 @@ module.exports = {
     getNotes,
     createNote,
     updateNote,
-    deleteNote,
-    deleteAllNotes
+    deleteNote
 };
