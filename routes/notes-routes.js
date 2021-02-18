@@ -13,6 +13,4 @@ router.patch('/update-note/:id', contollers.updateNote);
 
 router.delete('/delete-note/:id', contollers.deleteNote);
 
-router.delete('/delete-all-notes', contollers.deleteAllNotes);
-
 module.exports = router;
