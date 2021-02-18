@@ -79,17 +79,27 @@ const updateNote = async(req, res, next) => {
 
 const deleteNote = async(req, res, next) => {
     const noteId = req.params.id;
-
+    let note;
     try {
-        const note = await Note.findById(noteId);
-        if(!note) {
-            return res.status(404).json({message: errors.notFound('Note')});
-        };
-        note.remove();
-        res.status(200).json({deleted: note});
+        note = await Note.findById(noteId).populate('creator');
     } catch(e){
         return res.status(500).json({message: errors.unexpected});
     };
+
+    if(!note) {
+        return res.status(404).json({message: errors.notFound('Note')});
+    };
+    try{
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await note.remove({session: sess});
+        note.creator.notes.pull(note);
+        await note.creator.save({session: sess});
+        await sess.commitTransaction();
+    } catch(e) {
+        return res.status(500).json({message: errors.unexpected});
+    };
+    res.status(200).json({deleted: note});
 };
 
 const deleteAllNotes = async(req, res, next) => {
