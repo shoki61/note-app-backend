@@ -1,6 +1,8 @@
 const validator = require("validator");
+const mongoose = require('mongoose');
 
 const Note = require("../models/note");
+const User = require('../models/user');
 const errors = require('../error-messages/messages');
 
 const getNotes = async(req, res, next) => {
@@ -17,22 +19,40 @@ const getNotes = async(req, res, next) => {
 };
 
 const createNote = async(req, res, next) => {
-    const {title, description, image} = req.body;
+    const {title, description, image, creator} = req.body;
 
     if(!title || !description){
         return res.status(400).json({message: errors.required});
     };
+
+
+    let user;
+    try{
+        user = await User.findById(creator);
+    } catch(e){
+        return res.status(500).json({message: errors.unexpected});
+    };
+    if(!user){
+        return res.status(404).json({message: errors.notFound('User')});
+    };
+
+    const note = new Note({
+        title,
+        description,
+        image: image || '',
+        creator
+    });
     try {
-        const note = new Note({
-            title,
-            description,
-            image: image || ''
-        });
-        note.save();
-        return res.status(201).json({note});
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await note.save({session: sess});
+        user.notes.push(note);
+        await user.save({session: sess});
+        await sess.commitTransaction();
     } catch(e){
         return next(res.status(500).json({message: errors.unexpected}));
     };
+    res.status(201).json({note});
 };
 
 const updateNote = async(req, res, next) => {

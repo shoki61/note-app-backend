@@ -1,4 +1,5 @@
 const validator = require("validator");
+const bcrypt = require('bcryptjs');
 
 const User = require("../models/user");
 const errors = require('../error-messages/messages');
@@ -9,11 +10,20 @@ const signUp = async (req, res, next) => {
   if (!validator.isEmail(email) || !validator.isLength(password, { min: 8 })) {
     return res.json({ message: errors.invalid });
   }
+
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch(e){
+    return res.status(500).json({message:'Coult not create user, please try again.'});
+  };
+
   const user = new User({
     name,
     email,
-    password,
+    password: hashedPassword,
     job: job || "",
+    notes: []
   });
   try {
     await user.save();
@@ -42,6 +52,18 @@ const login = async (req, res, next) => {
       .status(401)
       .json({ message: "No user registered to this email, please sign up." });
   }
+
+  let isValidPassword;
+
+  try {
+    isValidPassword = await bcrypt.compare(password, user.password);
+  } catch(e){
+    return res.status.json({message:'Coult not log you in, please check your credentials and try egain.'});
+  };
+
+  if(!isValisPassword){
+    return res.status(401).json({message:'Invalid credentials, could not log you in'});
+  };
 
   if (user.password !== password) {
     return res
