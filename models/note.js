@@ -19,7 +19,20 @@ const noteSchema = mongoose.Schema({
         type: mongoose.Types.ObjectId,
         required: true,
         ref: 'User'
-    }
+    },
+    commends: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }],
+    likes: {
+        type: Number,
+    },
+    markings:{
+        type: Number
+    },
+    keywords:[{
+        type: String
+    }]
 },{timestamps: true});
 
 

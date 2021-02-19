@@ -36,6 +36,17 @@ const userSchema = mongoose.Schema({
         type: mongoose.Types.ObjectId, 
         required: true, 
         ref: 'Note'
+    }],
+    following: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+    }],
+    follower: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }],
+    links: [{
+        type: String
     }]
 },{timestamps: true});
 
