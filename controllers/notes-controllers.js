@@ -19,12 +19,11 @@ const getNotes = async(req, res, next) => {
 };
 
 const createNote = async(req, res, next) => {
-    const {title, description, image, creator} = req.body;
+    const {title, description, image, visible, creator} = req.body;
 
     if(!title || !description){
         return res.status(400).json({message: errors.required});
     };
-
 
     let user;
     try{
@@ -40,6 +39,7 @@ const createNote = async(req, res, next) => {
         title,
         description,
         image: image || '',
+        visible,
         creator
     });
     try {
