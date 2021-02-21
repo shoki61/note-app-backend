@@ -19,7 +19,8 @@ const getNotes = async(req, res, next) => {
 };
 
 const createNote = async(req, res, next) => {
-    const {title, description, image, visible, creator} = req.body;
+    const {title, description, keywords, image, visible, creator} = req.body;
+    
 
     if(!title || !description){
         return res.status(400).json({message: errors.required});
@@ -35,10 +36,12 @@ const createNote = async(req, res, next) => {
         return res.status(404).json({message: errors.notFound('User')});
     };
 
+
     const note = new Note({
         title,
         description,
         image: image || '',
+        keywords,
         visible,
         creator
     });
