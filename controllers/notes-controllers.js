@@ -5,6 +5,34 @@ const Note = require("../models/note");
 const User = require('../models/user');
 const errors = require('../error-messages/messages');
 
+const getNotesByUserId = async(req, res, next) => {
+    
+    const userId = req.params.id;
+    let userNotes;
+    try {
+        userNotes = await User.findById(userId).populate('notes');
+    } catch(e){
+        return res.status(5000).json({message: errors.unexpected});
+    };
+
+    res.status(200).json({notes: userNotes.notes});
+};
+
+const getNoteById = async(req, res, next) => {
+    const noteId = req.params.id;
+
+    let note;
+    try {
+        note = await Note.findById(noteId);
+    } catch(e){
+        return res.status().json({message: errors.unexpected});
+    };
+    if(!note){
+        return res.status(401).json({message: errors.notFound('Note')});
+    };
+    res.status(200).json({note});
+};
+
 const getNotes = async(req, res, next) => {
     let notes;
     try {
@@ -113,5 +141,7 @@ module.exports = {
     getNotes,
     createNote,
     updateNote,
-    deleteNote
+    deleteNote,
+    getNotesByUserId,
+    getNoteById
 };
