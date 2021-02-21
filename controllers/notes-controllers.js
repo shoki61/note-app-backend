@@ -19,7 +19,7 @@ const getNotes = async(req, res, next) => {
 };
 
 const createNote = async(req, res, next) => {
-    const {title, description, keywords, image, visible, creator} = req.body;
+    const {title, description, keywords, image, hidden, creator} = req.body;
     
 
     if(!title || !description){
@@ -42,7 +42,10 @@ const createNote = async(req, res, next) => {
         description,
         image: image || '',
         keywords,
-        visible,
+        hidden,
+        markings: 0,
+        likes: 0,
+        commends:[],
         creator
     });
     try {

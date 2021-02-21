@@ -27,12 +27,16 @@ const noteSchema = mongoose.Schema({
     likes: {
         type: Number,
     },
-    markings:{
+    markings: {
         type: Number
     },
-    keywords:[{
+    keywords: [{
         type: String
-    }]
+    }],
+    hidden: {
+        type: Boolean,
+        required: true
+    }
 },{timestamps: true});
 
 
