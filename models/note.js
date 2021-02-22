@@ -21,10 +21,13 @@ const noteSchema = mongoose.Schema({
         ref: 'User'
     },
     comments: [{
-        userId:{
-            type: String,
+        user:{
+            type: Object
         },
         comment: {
+            type: String
+        },
+        date: {
             type: String
         }
     }],

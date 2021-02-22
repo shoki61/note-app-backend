@@ -146,14 +146,19 @@ const addComment = async(req, res, next) => {
     try{
         note = await Note.findById(noteId);
         const user = await User.findById(userId);
+        console.log(typeof user);
         if(!user && !note) return res.status(404).json({message: errors.notFound('User or Note')});
         note.comments.push({
-            userId,
-            comment
+            user: {
+                name: user.name,
+                image: user.image
+            },
+            comment,
+            date: new Date().toLocaleDateString()
         });
         await note.save();
     } catch(e) {
-        return res.status(5000).json({message: errors.unexpected});
+        return res.status(500).json({message: errors.unexpected});
     };
     res.status(201).json({note})
 };
