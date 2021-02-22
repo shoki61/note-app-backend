@@ -23,7 +23,7 @@ const getNoteById = async(req, res, next) => {
 
     let note;
     try {
-        note = await Note.findById(noteId);
+        note = await Note.findById(noteId).populate('creator');
     } catch(e){
         return res.status().json({message: errors.unexpected});
     };
@@ -73,7 +73,7 @@ const createNote = async(req, res, next) => {
         hidden,
         markings: 0,
         likes: 0,
-        commends:[],
+        comments:[],
         creator
     });
     try {
@@ -136,6 +136,28 @@ const deleteNote = async(req, res, next) => {
     res.status(200).json({deleted: note});
 };
 
+const addComment = async(req, res, next) => {
+    const noteId = req.params.id;
+    const { userId, comment } = req.body;
+    if(!userId || !comment ){
+        return res.status(401).json({message: errors.invalid});
+    };
+    let note;
+    try{
+        note = await Note.findById(noteId);
+        const user = await User.findById(userId);
+        if(!user && !note) return res.status(404).json({message: errors.notFound('User or Note')});
+        note.comments.push({
+            userId,
+            comment
+        });
+        await note.save();
+    } catch(e) {
+        return res.status(5000).json({message: errors.unexpected});
+    };
+    res.status(201).json({note})
+};
+
 
 module.exports = {
     getNotes,
@@ -143,5 +165,6 @@ module.exports = {
     updateNote,
     deleteNote,
     getNotesByUserId,
-    getNoteById
+    getNoteById,
+    addComment
 };
