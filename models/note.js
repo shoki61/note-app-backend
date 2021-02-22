@@ -20,9 +20,13 @@ const noteSchema = mongoose.Schema({
         required: true,
         ref: 'User'
     },
-    commends: [{
-        type: mongoose.Types.ObjectId,
-        ref: 'User'
+    comments: [{
+        userId:{
+            type: String,
+        },
+        comment: {
+            type: String
+        }
     }],
     likes: {
         type: Number,
