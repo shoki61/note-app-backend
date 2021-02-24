@@ -23,7 +23,14 @@ const signUp = async (req, res, next) => {
     email,
     password: hashedPassword,
     job: job || "",
-    notes: []
+    notes: [],
+    likes: [],
+    markings: [],
+    image: '',
+    following: [],
+    follower: [],
+    links:[],
+    comments:[]
   });
   try {
     await user.save();
