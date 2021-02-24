@@ -23,7 +23,7 @@ const getNoteById = async(req, res, next) => {
 
     let note;
     try {
-        note = await Note.findById(noteId).populate('creator');
+        note = await Note.findById(noteId).populate('creator').populate('comments.user');
     } catch(e){
         return res.status().json({message: errors.unexpected});
     };
@@ -50,7 +50,7 @@ const createNote = async(req, res, next) => {
     const {title, description, keywords, image, hidden, creator} = req.body;
     
 
-    if(!title || !description){
+    if(!title && !description){
         return res.status(400).json({message: errors.required});
     };
 
@@ -69,13 +69,14 @@ const createNote = async(req, res, next) => {
         title,
         description,
         image: image || '',
-        keywords,
+        keywords: keywords || [],
         hidden,
-        markings: 0,
-        likes: 0,
+        markings: [],
+        likes: [],
         comments:[],
         creator
     });
+    
     try {
         const sess = await mongoose.startSession();
         sess.startTransaction();
@@ -93,22 +94,67 @@ const updateNote = async(req, res, next) => {
     const noteId = req.params.id;
 
     const updates = Object.keys(req.body);
-    const allowedUpdates = ["title", "description"];
+    const allowedUpdates = ["title", "description", "keywords", "likes", "markings", "comments", "comment", "image", "hidden", "userId"];
     const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+    
     if(!isValidOperation) {
         return res.status(400).json({message: 'Please enter an item you want to update.'});
     };
+    let note;
     try {
-        let note = await Note.findById(noteId);
+        note = await Note.findById(noteId);
         if(!note){
             return res.status(404).json({message: errors.notFound('Note')});
         };
-        updates.forEach(update => note[update] = req.body[update]);
-        await note.save();
-        res.status(200).json({note});
     } catch(e){
         return res.status(500).json({message: errors.unexpected});
     };
+    
+
+    let user;
+    try{
+        user = await User.findById(req.body.userId);
+    } catch(e){
+        return res.status(401).json({message: errors.notFound('User')});
+    };
+
+    updates.forEach( async update => {
+        if(update === 'likes'){
+            const userId = req.body.userId;
+            note[update].push(userId);
+            const sess = await mongoose.startSession();
+            sess.startTransaction();
+            await note.save({session: sess});
+            user.likes.push(note);
+            await user.save({session: sess});
+            await sess.commitTransaction();
+        }else if (update === 'markings'){
+            const userId = req.body.userId;
+            note[update].push(userId);
+            const sess = await mongoose.startSession();
+            sess.startTransaction();
+            await note.save({session: sess});
+            user.markings.push(note);
+            await user.save({session: sess});
+            await sess.commitTransaction();
+        }else if(update === 'comments'){
+            const userId = req.body.userId;
+            note[update].push({
+                user: userId,
+                comment: req.body.comment,
+                date: new Date().toLocaleString()
+            });
+            const sess = await mongoose.startSession();
+            sess.startTransaction();
+            await note.save({session: sess});
+            user.comments.push(note);
+            await user.save({session: sess});
+            await sess.commitTransaction();
+        }else{
+            note[update] = req.body[update];
+        };
+    });
+    res.status(200).json({note});
 };
 
 const deleteNote = async(req, res, next) => {
@@ -136,32 +182,6 @@ const deleteNote = async(req, res, next) => {
     res.status(200).json({deleted: note});
 };
 
-const addComment = async(req, res, next) => {
-    const noteId = req.params.id;
-    const { userId, comment } = req.body;
-    if(!userId || !comment ){
-        return res.status(401).json({message: errors.invalid});
-    };
-    let note;
-    try{
-        note = await Note.findById(noteId);
-        const user = await User.findById(userId);
-        console.log(typeof user);
-        if(!user && !note) return res.status(404).json({message: errors.notFound('User or Note')});
-        note.comments.push({
-            user: {
-                name: user.name,
-                image: user.image
-            },
-            comment,
-            date: new Date().toLocaleDateString()
-        });
-        await note.save();
-    } catch(e) {
-        return res.status(500).json({message: errors.unexpected});
-    };
-    res.status(201).json({note})
-};
 
 
 module.exports = {
@@ -171,5 +191,4 @@ module.exports = {
     deleteNote,
     getNotesByUserId,
     getNoteById,
-    addComment
 };

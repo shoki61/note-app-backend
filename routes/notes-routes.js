@@ -19,6 +19,5 @@ router.patch('/update-note/:id', contollers.updateNote);
 
 router.delete('/delete-note/:id', contollers.deleteNote);
 
-router.patch('/add-comment/:id', contollers.addComment)
 
 module.exports = router;
