@@ -121,22 +121,28 @@ const updateNote = async(req, res, next) => {
     updates.forEach( async update => {
         if(update === 'likes'){
             const userId = req.body.userId;
+            if(note[update].indexOf(userId) > -1) return;
             note[update].push(userId);
+
             const sess = await mongoose.startSession();
             sess.startTransaction();
             await note.save({session: sess});
             user.likes.push(note);
             await user.save({session: sess});
             await sess.commitTransaction();
+
         }else if (update === 'markings'){
             const userId = req.body.userId;
+            if(note[update].indexOf(userId) > -1) return;
             note[update].push(userId);
+
             const sess = await mongoose.startSession();
             sess.startTransaction();
             await note.save({session: sess});
             user.markings.push(note);
             await user.save({session: sess});
             await sess.commitTransaction();
+
         }else if(update === 'comments'){
             const userId = req.body.userId;
             note[update].push({
@@ -144,16 +150,19 @@ const updateNote = async(req, res, next) => {
                 comment: req.body.comment,
                 date: new Date().toLocaleString()
             });
+
             const sess = await mongoose.startSession();
             sess.startTransaction();
             await note.save({session: sess});
             user.comments.push(note);
             await user.save({session: sess});
             await sess.commitTransaction();
+            
         }else{
             note[update] = req.body[update];
         };
     });
+    if(updates.indexOf('comments') > -1 && req.body.comment === '') return res.status(401).json({message:errors.required});
     res.status(200).json({note});
 };
 
