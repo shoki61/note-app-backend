@@ -22,7 +22,8 @@ const noteSchema = mongoose.Schema({
     },
     comments: [{
         user:{
-            type: Object
+            type: mongoose.Types.ObjectId,
+            ref: 'User'
         },
         comment: {
             type: String
@@ -31,12 +32,14 @@ const noteSchema = mongoose.Schema({
             type: String
         }
     }],
-    likes: {
-        type: Number,
-    },
-    markings: {
-        type: Number
-    },
+    likes: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }],
+    markings: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    }],
     keywords: [{
         type: String
     }],

@@ -39,7 +39,7 @@ const userSchema = mongoose.Schema({
     }],
     following: [{
         type: mongoose.Types.ObjectId,
-        ref: 'User',
+        ref: 'User'
     }],
     follower: [{
         type: mongoose.Types.ObjectId,
@@ -47,6 +47,18 @@ const userSchema = mongoose.Schema({
     }],
     links: [{
         type: String
+    }],
+    markings: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Note'
+    }],
+    likes: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Note'
+    }],
+    comments: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Note'
     }]
 },{timestamps: true});
 
