@@ -183,6 +183,9 @@ const deleteNote = async(req, res, next) => {
         sess.startTransaction();
         await note.remove({session: sess});
         note.creator.notes.pull(note);
+        note.creator.likes.pull(note);
+        note.creator.markings.pull(note);
+        note.creator.comments.pull(note);
         await note.creator.save({session: sess});
         await sess.commitTransaction();
     } catch(e) {
