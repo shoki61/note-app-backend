@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Note = require("../models/note");
 const User = require('../models/user');
 const errors = require('../error-messages/messages');
+const { update } = require("../models/note");
 
 const getNotesByUserId = async(req, res, next) => {
     
@@ -47,7 +48,7 @@ const getNotes = async(req, res, next) => {
 };
 
 const createNote = async(req, res, next) => {
-    const {title, description, keywords, image, hidden, creator} = req.body;
+    const {title, description, keywords, image, hidden, userId} = req.body;
     
 
     if(!title && !description){
@@ -56,7 +57,7 @@ const createNote = async(req, res, next) => {
 
     let user;
     try{
-        user = await User.findById(creator);
+        user = await User.findById(userId);
     } catch(e){
         return res.status(500).json({message: errors.unexpected});
     };
@@ -74,7 +75,7 @@ const createNote = async(req, res, next) => {
         markings: [],
         likes: [],
         comments:[],
-        creator
+        creator: userId
     });
     
     try {
@@ -118,7 +119,7 @@ const updateNote = async(req, res, next) => {
         return res.status(401).json({message: errors.notFound('User')});
     };
 
-    updates.forEach( async update => {
+    await updates.forEach( async update => {
         if(update === 'likes'){
             const userId = req.body.userId;
             if(note[update].indexOf(userId) > -1) return;
@@ -162,6 +163,9 @@ const updateNote = async(req, res, next) => {
             note[update] = req.body[update];
         };
     });
+    if(updates.indexOf('likes') === -1 && updates.indexOf('markings') === -1 && updates.indexOf('comments') === -1){
+        await note.save();
+    };
     if(updates.indexOf('comments') > -1 && req.body.comment === '') return res.status(401).json({message:errors.required});
     res.status(200).json({note});
 };
