@@ -149,8 +149,8 @@ const deleteUser = async(req, res, next) => {
         if(!user){
             return res.status(404).json({message: errors.notFound('User')});
         };
-        user.remove();
-        res.json({deleted:user});
+        await user.remove();
+        res.status(200).json({deleted:user});
     } catch(e) {
         return res.status().json({message: errors.unexpected});
     };
