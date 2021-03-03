@@ -1,5 +1,6 @@
 const validator = require("validator");
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 
 const User = require("../models/user");
 const errors = require('../error-messages/messages');
@@ -104,7 +105,7 @@ const updateUser = async (req, res, next) => {
   const userId = req.params.id;
 
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "password", "job"];
+  const allowedUpdates = ["name", "email", "password", "job", "follow", ];
   const isValidOperation = updates.every(update => allowedUpdates.includes(update));
   if (!isValidOperation) {
     return res.status(400).send({message:'Please enter an item you want to update'});
@@ -115,8 +116,24 @@ const updateUser = async (req, res, next) => {
     if(!user){
         return res.status(404).json({message: errors.notFound('User')});
     };
-    updates.forEach(update => user[update] = req.body[update]);
-    await user.save();
+    let followUser;
+    if(req.body.follow){
+      followUser = await User.findById(req.body.follow);
+      if(!followUser) return res.status(401).json({message: errors.notFound('User')});
+    };
+    updates.forEach(async update => {
+      if(update === 'follow'){
+        user.following.push(req.body.follow);
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await user.save({session: sess});
+        followUser.follower.push(user);
+        await followUser.save({session: sess});
+        await sess.commitTransaction();
+      }else{
+        user[update] = req.body[update]
+      }
+    });
     res.status(200).json({user});
   } catch (e) {
     return res.status(500).json({message: errors.unexpected});
