@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const User = require("../models/user");
 const errors = require('../error-messages/messages');
+const Note = require("../models/note");
 
 
 const signUp = async (req, res, next) => {
@@ -149,6 +150,7 @@ const deleteUser = async(req, res, next) => {
         if(!user){
             return res.status(404).json({message: errors.notFound('User')});
         };
+        await Note.deleteMany({creator:user._id});
         await user.remove();
         res.status(200).json({deleted:user});
     } catch(e) {
