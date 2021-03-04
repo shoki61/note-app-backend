@@ -146,15 +146,15 @@ const deleteUser = async(req, res, next) => {
 
     let user;
     try {
-        user = await User.findById(userId);
+        user = await User.findById(userId).populate('following');
         if(!user){
             return res.status(404).json({message: errors.notFound('User')});
         };
-        await Note.deleteMany({creator:user._id});
+        await Note.deleteMany({creator: user._id});
         await user.remove();
         res.status(200).json({deleted:user});
     } catch(e) {
-        return res.status().json({message: errors.unexpected});
+        return res.status(500).json({message: errors.unexpected});
     };
 };
 
