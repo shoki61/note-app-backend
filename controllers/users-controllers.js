@@ -95,7 +95,7 @@ const getUser = async(req, res, next) => {
 
     let user;
     try {
-        user = await User.findById(userId);
+        user = await User.findById(userId).populate('notes').populate('follower').populate('following');
         res.json(user);
     }catch(e) {
         return res.status(500).json({message: errors.notFound('User')});
@@ -111,12 +111,14 @@ const updateUser = async (req, res, next) => {
   if (!isValidOperation) {
     return res.status(400).send({message:'Please enter an item you want to update'});
   };
+  
 
   try {
     let user = await User.findById(userId);
     if(!user){
         return res.status(404).json({message: errors.notFound('User')});
     };
+    
     let followUser;
     if(req.body.follow){
       followUser = await User.findById(req.body.follow);
@@ -124,13 +126,15 @@ const updateUser = async (req, res, next) => {
     };
     updates.forEach(async update => {
       if(update === 'follow'){
-        user.following.push(req.body.follow);
-        const sess = await mongoose.startSession();
-        sess.startTransaction();
-        await user.save({session: sess});
-        followUser.follower.push(user);
-        await followUser.save({session: sess});
-        await sess.commitTransaction();
+        if(!followUser.follower.includes(userId)){
+          user.following.push(req.body.follow);
+          const sess = await mongoose.startSession();
+          sess.startTransaction();
+          await user.save({session: sess});
+          followUser.follower.push(user);
+          await followUser.save({session: sess});
+          await sess.commitTransaction();
+        }
       }else{
         user[update] = req.body[update]
       }
