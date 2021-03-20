@@ -1,3 +1,5 @@
+//Solve mongoose.startSession() repeat
+
 const validator = require("validator");
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -132,6 +134,16 @@ const updateUser = async (req, res, next) => {
           sess.startTransaction();
           await user.save({session: sess});
           followUser.follower.push(user);
+          await followUser.save({session: sess});
+          await sess.commitTransaction();
+        }else {
+          const newFollowings = user.following.filter(item => item.toString() !== req.body.follow );
+          const newFollowers = followUser.follower.filter(item => item.toString() !== user._id.toString());
+          user.following = newFollowings;
+          const sess = await mongoose.startSession();
+          sess.startTransaction();
+          await user.save({session: sess});
+          followUser.follower = newFollowers;
           await followUser.save({session: sess});
           await sess.commitTransaction();
         }
