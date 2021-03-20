@@ -145,10 +145,14 @@ const updateNote = async(req, res, next) => {
             await sess.commitTransaction();
 
         }else if(update === 'comments'){
-            const userId = req.body.userId;
+            const user = await User.findById(req.body.userId);
+            const { userId, comment } = req.body;
+            if(!user) return;
             note[update].push({
                 user: userId,
-                comment: req.body.comment,
+                name: user.name,
+                image: user.image,
+                comment: comment,
                 date: new Date().toLocaleString()
             });
 

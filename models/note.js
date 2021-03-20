@@ -25,6 +25,12 @@ const noteSchema = mongoose.Schema({
             type: mongoose.Types.ObjectId,
             ref: 'User'
         },
+        name: {
+            type: String
+        },
+        image: {
+            type: String
+        },
         comment: {
             type: String
         },

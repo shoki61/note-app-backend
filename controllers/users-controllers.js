@@ -164,7 +164,7 @@ const deleteUser = async(req, res, next) => {
     try {
         user = await User.findById(userId).populate('following');
         if(!user){
-            return res.status(404).json({message: errors.notFound('User')});
+          return res.status(404).json({message: errors.notFound('User')});
         };
         await Note.deleteMany({creator: user._id});
         await user.remove();
