@@ -52,7 +52,7 @@ const login = async (req, res, next) => {
 
   let user;
   try {
-    user = await User.findOne({ email });
+    user = await User.findOne({ email }).populate('markings').populate('likes').populate('comments');
   } catch (e) {
     return res
       .status(500)
@@ -97,7 +97,13 @@ const getUser = async(req, res, next) => {
 
     let user;
     try {
-        user = await User.findById(userId).populate('notes').populate('follower').populate('following');
+        user = await User.findById(userId)
+          .populate('notes')
+          .populate('follower')
+          .populate('following')
+          .populate('markings')
+          .populate('likes')
+          .populate('comments');
         res.json(user);
     }catch(e) {
         return res.status(500).json({message: errors.notFound('User')});
