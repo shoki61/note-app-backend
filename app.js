@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -7,8 +10,10 @@ const notesRouter = require('./routes/notes-routes');
 
 const app = express();
 
-
 app.use(bodyParser.json());
+
+app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+
 app.use((req, res, next)=>{
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader(
@@ -18,9 +23,25 @@ app.use((req, res, next)=>{
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, PATCH');
     next();
 });
+
+
 app.use('/api/users', usersRouter);
 app.use('/api/notes', notesRouter);
 
+app.use((req, res, next) => {
+    const error = new Error('Coult not find this routes');
+    throw res.status(404).json({error});
+});
+
+app.use((error, req, res, next) => {
+    if(req.file){
+        fs.unlink(req.file.path, error => console.log(error));
+    };
+    if(res.headerSent){
+        return next(error);
+    };
+    res.status(error.code || 500).json({message: error.message || 'An unknown error occurred'});
+});
 
 
 mongoose.connect('mongodb+srv://shoki:murtishoki61@cluster0.sbiw4.mongodb.net/mern?retryWrites=true&w=majority')

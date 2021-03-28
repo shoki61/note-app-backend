@@ -2,7 +2,6 @@
 
 const validator = require("validator");
 const bcrypt = require('bcryptjs');
-const mongoose = require('mongoose');
 
 const User = require("../models/user");
 const errors = require('../error-messages/messages');
@@ -110,11 +109,16 @@ const getUser = async(req, res, next) => {
     };
 };
 
+
+
+
 const updateUser = async (req, res, next) => {
   const userId = req.params.id;
 
+
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "password", "job", "follow", ];
+
+  const allowedUpdates = ["name", "image", "email", "password", "job", "follow", ];
   const isValidOperation = updates.every(update => allowedUpdates.includes(update));
   if (!isValidOperation) {
     return res.status(400).send({message:'Please enter an item you want to update'});
@@ -153,10 +157,19 @@ const updateUser = async (req, res, next) => {
           await followUser.save({session: sess});
           await sess.commitTransaction();
         }
-      }else{
+      }
+      else{
         user[update] = req.body[update]
       }
     });
+    if(req.file.path){
+      user.image = req.file.path
+    };
+    try{
+      await user.save();
+    }catch(e){
+      console.log(e);
+    };
     res.status(200).json({user});
   } catch (e) {
     return res.status(500).json({message: errors.unexpected});
