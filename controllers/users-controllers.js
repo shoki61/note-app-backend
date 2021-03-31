@@ -2,6 +2,7 @@
 
 const validator = require("validator");
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 
 const User = require("../models/user");
 const errors = require('../error-messages/messages');
@@ -162,16 +163,20 @@ const updateUser = async (req, res, next) => {
         user[update] = req.body[update]
       }
     });
-    if(req.file.path){
+    if(req.file && req.file.path){
       user.image = req.file.path
     };
+    
     try{
-      await user.save();
+      if(!req.body.follow){
+        await user.save();
+      }
+      res.status(200).json({user});
     }catch(e){
       console.log(e);
     };
-    res.status(200).json({user});
   } catch (e) {
+    console.log('++++++++++++++++++++')
     return res.status(500).json({message: errors.unexpected});
   };
 };
