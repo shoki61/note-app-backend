@@ -164,19 +164,15 @@ const updateUser = async (req, res, next) => {
       }
     });
     if(req.file && req.file.path){
-      user.image = req.file.path
+      user.image = req.file.path;
     };
     
-    try{
-      if(!req.body.follow){
-        await user.save();
-      }
-      res.status(200).json({user});
-    }catch(e){
-      console.log(e);
+    if(!req.body.follow){
+      await user.save();
     };
+    res.status(200).json({user});
+    
   } catch (e) {
-    console.log('++++++++++++++++++++')
     return res.status(500).json({message: errors.unexpected});
   };
 };
