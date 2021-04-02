@@ -110,12 +110,8 @@ const getUser = async(req, res, next) => {
     };
 };
 
-
-
-
 const updateUser = async (req, res, next) => {
   const userId = req.params.id;
-
 
   const updates = Object.keys(req.body);
 
@@ -125,9 +121,8 @@ const updateUser = async (req, res, next) => {
     return res.status(400).send({message:'Please enter an item you want to update'});
   };
   
-
   try {
-    let user = await User.findById(userId);
+    let user = await User.findById(userId).populate('follower').populate('following');
     if(!user){
         return res.status(404).json({message: errors.notFound('User')});
     };
@@ -140,7 +135,7 @@ const updateUser = async (req, res, next) => {
     updates.forEach(async update => {
       if(update === 'follow'){
         if(!followUser.follower.includes(userId)){
-          user.following.push(req.body.follow);
+          user.following.push(followUser);
           const sess = await mongoose.startSession();
           sess.startTransaction();
           await user.save({session: sess});
@@ -148,7 +143,7 @@ const updateUser = async (req, res, next) => {
           await followUser.save({session: sess});
           await sess.commitTransaction();
         }else {
-          const newFollowings = user.following.filter(item => item.toString() !== req.body.follow );
+          const newFollowings = user.following.filter(item => item._id.toString() !== req.body.follow );
           const newFollowers = followUser.follower.filter(item => item.toString() !== user._id.toString());
           user.following = newFollowings;
           const sess = await mongoose.startSession();
@@ -157,11 +152,11 @@ const updateUser = async (req, res, next) => {
           followUser.follower = newFollowers;
           await followUser.save({session: sess});
           await sess.commitTransaction();
-        }
+        };
       }
       else{
-        user[update] = req.body[update]
-      }
+        user[update] = req.body[update];
+      };
     });
     if(req.file && req.file.path){
       user.image = req.file.path;
