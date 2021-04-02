@@ -48,8 +48,7 @@ const getNotes = async(req, res, next) => {
 };
 
 const createNote = async(req, res, next) => {
-    const {title, description, keywords, image, hidden, userId} = req.body;
-    
+    const {title, description, keywords, hidden, userId} = req.body;
 
     if(!title && !description){
         return res.status(400).json({message: errors.required});
@@ -65,12 +64,13 @@ const createNote = async(req, res, next) => {
         return res.status(404).json({message: errors.notFound('User')});
     };
 
+    const arrKeywords = keywords.split(',');
 
     const note = new Note({
         title,
         description,
-        image: image || '',
-        keywords: keywords || [],
+        image: req.file.path || null,
+        keywords: arrKeywords || [],
         hidden,
         markings: [],
         likes: [],
