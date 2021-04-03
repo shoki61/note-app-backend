@@ -93,12 +93,9 @@ const createNote = async(req, res, next) => {
 
 const updateNote = async(req, res, next) => {
     const noteId = req.params.id;
-
     const updates = Object.keys(req.body);
     const allowedUpdates = ["title", "description", "keywords", "likes", "markings", "comments", "comment", "image", "hidden", "userId"];
     const isValidOperation = updates.every(update => allowedUpdates.includes(update));
-    
-    console.log(isValidOperation);
 
     if(!isValidOperation) {
         return res.status(400).json({message: 'Please enter an item you want to update.'});
@@ -165,8 +162,6 @@ const updateNote = async(req, res, next) => {
             await user.save({session: sess});
             await sess.commitTransaction();
             
-        }else if(update === 'image'){
-            note[update] = req.file ? req.file.path : null;
         }else if(update === 'keywords'){
             const arrKeywords = req.body.keywords.split(',');
             note[update] = arrKeywords;
@@ -174,6 +169,10 @@ const updateNote = async(req, res, next) => {
             note[update] = req.body[update];
         };
     });
+
+    if(req.file && req.file.path){
+        note.image = req.file.path;
+    };
     if(updates.indexOf('likes') === -1 && updates.indexOf('markings') === -1 && updates.indexOf('comments') === -1){
         await note.save();
     };
