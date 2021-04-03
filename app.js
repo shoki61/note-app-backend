@@ -45,5 +45,5 @@ app.use((error, req, res, next) => {
 
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.sbiw4.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`)
-    .then(() => app.listen(5000))
+    .then(() => app.listen(process.env.PORT || 5000))
     .catch(error => console.log(error));
