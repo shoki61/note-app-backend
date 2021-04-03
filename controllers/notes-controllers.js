@@ -69,7 +69,7 @@ const createNote = async(req, res, next) => {
     const note = new Note({
         title,
         description,
-        image: req.file.path || null,
+        image: req.file ? req.file.path : null,
         keywords: arrKeywords || [],
         hidden,
         markings: [],
@@ -98,6 +98,8 @@ const updateNote = async(req, res, next) => {
     const allowedUpdates = ["title", "description", "keywords", "likes", "markings", "comments", "comment", "image", "hidden", "userId"];
     const isValidOperation = updates.every(update => allowedUpdates.includes(update));
     
+    console.log(isValidOperation);
+
     if(!isValidOperation) {
         return res.status(400).json({message: 'Please enter an item you want to update.'});
     };
@@ -163,6 +165,11 @@ const updateNote = async(req, res, next) => {
             await user.save({session: sess});
             await sess.commitTransaction();
             
+        }else if(update === 'image'){
+            note[update] = req.file ? req.file.path : null;
+        }else if(update === 'keywords'){
+            const arrKeywords = req.body.keywords.split(',');
+            note[update] = arrKeywords;
         }else{
             note[update] = req.body[update];
         };
