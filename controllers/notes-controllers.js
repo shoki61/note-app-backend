@@ -1,10 +1,8 @@
-const validator = require("validator");
 const mongoose = require('mongoose');
 
 const Note = require("../models/note");
 const User = require('../models/user');
 const errors = require('../error-messages/messages');
-const { update } = require("../models/note");
 
 const getNotesByUserId = async(req, res, next) => {
     
@@ -37,7 +35,7 @@ const getNoteById = async(req, res, next) => {
 const getNotes = async(req, res, next) => {
     let notes;
     try {
-        notes = await Note.find({});
+        notes = await Note.find({}).populate('creator');
         if(!notes.length){
             return res.status(404).json({message: errors.notFound('Notes')});
         };
