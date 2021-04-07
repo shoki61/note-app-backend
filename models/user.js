@@ -45,9 +45,9 @@ const userSchema = mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: 'User'
     }],
-    links: [{
-        type: String
-    }],
+    links: {
+        type: Object
+    },
     markings: [{
         type: mongoose.Types.ObjectId,
         ref: 'Note'

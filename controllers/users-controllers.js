@@ -10,7 +10,7 @@ const Note = require("../models/note");
 
 
 const signUp = async (req, res, next) => {
-  const { name, email, password, job } = req.body;
+  const { name, email, password, job, links } = req.body;
   if (!validator.isEmail(email) || !validator.isLength(password, { min: 8 })) {
     return res.json({ message: errors.invalid });
   }
@@ -26,7 +26,7 @@ const signUp = async (req, res, next) => {
     name,
     email,
     password: hashedPassword,
-    job: job || "",
+    job: '',
     notes: [],
     likes: [],
     markings: [],
@@ -108,14 +108,14 @@ const getUser = async(req, res, next) => {
     }catch(e) {
         return res.status(500).json({message: errors.notFound('User')});
     };
-};
-
-const updateUser = async (req, res, next) => {
+  };
+  
+  const updateUser = async (req, res, next) => {
   const userId = req.params.id;
-
+    
   const updates = Object.keys(req.body);
-
-  const allowedUpdates = ["name", "image", "email", "password", "job", "follow", ];
+    
+  const allowedUpdates = ["name", "image", "email", "password", "job", "links", "follow", ];
   const isValidOperation = updates.every(update => allowedUpdates.includes(update));
   if (!isValidOperation) {
     return res.status(400).send({message:'Please enter an item you want to update'});
@@ -153,8 +153,10 @@ const updateUser = async (req, res, next) => {
           await followUser.save({session: sess});
           await sess.commitTransaction();
         };
-      }
-      else{
+      }else if(update === 'links'){
+        const parsedLinks = JSON.parse(req.body[update]);
+        user.links = parsedLinks;
+      }else{
         user[update] = req.body[update];
       };
     });
