@@ -61,8 +61,7 @@ const createNote = async(req, res, next) => {
     if(!user){
         return res.status(404).json({message: errors.notFound('User')});
     };
-
-    const arrKeywords = keywords.split(',');
+    const arrKeywords = keywords ? keywords.split(',') : null;
 
     const note = new Note({
         title,
@@ -94,6 +93,7 @@ const updateNote = async(req, res, next) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ["title", "description", "keywords", "likes", "markings", "comments", "comment", "image", "hidden", "userId"];
     const isValidOperation = updates.every(update => allowedUpdates.includes(update));
+
 
     if(!isValidOperation) {
         return res.status(400).json({message: 'Please enter an item you want to update.'});
@@ -161,8 +161,12 @@ const updateNote = async(req, res, next) => {
             await sess.commitTransaction();
             
         }else if(update === 'keywords'){
-            const arrKeywords = req.body.keywords.split(',');
+            const arrKeywords = req.body.keywords ? req.body.keywords.split(',') : [];
             note[update] = arrKeywords;
+        }else if(update === 'image'){
+            if(req.body[update] === 'null'){
+                note[update] = null;
+            }
         }else{
             note[update] = req.body[update];
         };
