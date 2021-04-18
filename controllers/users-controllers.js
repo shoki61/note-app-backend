@@ -10,7 +10,7 @@ const Note = require("../models/note");
 
 
 const signUp = async (req, res, next) => {
-  const { name, email, password, job, links } = req.body;
+  const { name, email, password } = req.body;
   if (!validator.isEmail(email) || !validator.isLength(password, { min: 8 })) {
     return res.json({ message: errors.invalid });
   }
@@ -22,6 +22,8 @@ const signUp = async (req, res, next) => {
     return res.status(500).json({message:'Coult not create user, please try again.'});
   };
 
+  const existingUser = await User.findOne({email});
+  if(existingUser) return res.status(400).json({message: 'There is a registered user for this mail'})
   const user = new User({
     name,
     email,
@@ -110,7 +112,7 @@ const getUser = async(req, res, next) => {
     };
   };
   
-  const updateUser = async (req, res, next) => {
+const updateUser = async (req, res, next) => {
   const userId = req.params.id;
     
   const updates = Object.keys(req.body);
